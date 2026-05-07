@@ -22,7 +22,13 @@ func Extract(lang Language, body []byte, opts Options) (Result, error) {
 		// Phase 1 will swap in a TS-specific grammar to handle
 		// `import type` and `export = X` shapes.
 		return jsExtract(body, opts)
-	case Python, Go, Rust, Ruby, Java, PHP, CSharp:
+	case Python:
+		return pyExtract(body, opts)
+	case Go:
+		return goExtract(body, opts)
+	case Rust:
+		return rsExtract(body, opts)
+	case Ruby, Java, PHP, CSharp:
 		return Result{}, fmt.Errorf("depusage: language %q not yet implemented", lang)
 	}
 	return Result{}, fmt.Errorf("depusage: unknown language %q", lang)
