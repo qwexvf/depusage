@@ -7,6 +7,14 @@ once it reaches 1.0. Pre-1.0 minor bumps may include API changes.
 
 ## [Unreleased]
 
+## [0.1.1] — 2026-05-08
+
+### Changed
+
+- TypeScript comment in `extract.go` corrected — TS intentionally
+  shares the JS extractor; the earlier "will land in Phase 1" note
+  was stale now that Phase 1 is shipped.
+
 ## [0.1.0] — 2026-05-08
 
 First feature-complete release covering all three reachability passes

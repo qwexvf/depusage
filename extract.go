@@ -25,9 +25,10 @@ import (
 func Extract(lang Language, body []byte, opts Options) (Result, error) {
 	switch lang {
 	case JavaScript, TypeScript:
-		// TS shares the JS extractor for now (P0 scope: imports only).
-		// A TS-specific grammar will land in Phase 1 to cover
-		// `import type` and `export = X` shapes.
+		// TypeScript intentionally shares the JS extractor. The JS
+		// grammar parses the common import shapes correctly; `import
+		// type` and `export = X` are TS-only and would need a separate
+		// grammar — deferred until a concrete use case requires it.
 		return javascript.Extract(body, opts)
 	case Python:
 		return python.Extract(body, opts)
