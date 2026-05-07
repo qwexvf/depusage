@@ -1,41 +1,48 @@
 package depusage
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/qwexvf/depusage/internal/lang/csharp"
+	"github.com/qwexvf/depusage/internal/lang/golang"
+	"github.com/qwexvf/depusage/internal/lang/java"
+	"github.com/qwexvf/depusage/internal/lang/javascript"
+	"github.com/qwexvf/depusage/internal/lang/php"
+	"github.com/qwexvf/depusage/internal/lang/python"
+	"github.com/qwexvf/depusage/internal/lang/ruby"
+	"github.com/qwexvf/depusage/internal/lang/rust"
+)
 
 // Extract is the top-level dispatcher. It picks the per-language
 // extractor implementation, runs the requested passes, and returns
 // the aggregated result.
 //
-// All language extractors live in this package as siblings (js.go,
-// py.go, ...) and share the parser pool / cursor pool helpers from
-// internal/tsutil. Per-language tree-sitter queries live under
-// lang/<x>/queries.scm and are //go:embed'd by the matching .go file.
+// Per-language extractors live under internal/lang/<name>. Each one
+// owns its own tree-sitter parser pool, query, and dep-key normalizer.
 //
-// Concurrency: safe for concurrent callers. Each per-language
-// extractor maintains its own parser/cursor pool.
+// Concurrency: safe for concurrent callers — every per-language
+// extractor maintains its own pool.
 func Extract(lang Language, body []byte, opts Options) (Result, error) {
 	switch lang {
-	case JavaScript:
-		return jsExtract(body, opts)
-	case TypeScript:
+	case JavaScript, TypeScript:
 		// TS shares the JS extractor for now (P0 scope: imports only).
-		// Phase 1 will swap in a TS-specific grammar to handle
+		// A TS-specific grammar will land in Phase 1 to cover
 		// `import type` and `export = X` shapes.
-		return jsExtract(body, opts)
+		return javascript.Extract(body, opts)
 	case Python:
-		return pyExtract(body, opts)
+		return python.Extract(body, opts)
 	case Go:
-		return goExtract(body, opts)
+		return golang.Extract(body, opts)
 	case Rust:
-		return rsExtract(body, opts)
+		return rust.Extract(body, opts)
 	case Ruby:
-		return rbExtract(body, opts)
+		return ruby.Extract(body, opts)
 	case Java:
-		return jvExtract(body, opts)
+		return java.Extract(body, opts)
 	case PHP:
-		return phpExtract(body, opts)
+		return php.Extract(body, opts)
 	case CSharp:
-		return csExtract(body, opts)
+		return csharp.Extract(body, opts)
 	}
 	return Result{}, fmt.Errorf("depusage: unknown language %q", lang)
 }

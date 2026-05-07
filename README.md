@@ -51,6 +51,24 @@ for _, imp := range res.Imports {
 - CGo enabled — tree-sitter ships a C runtime. Each language grammar
   adds ~3–4 MB to the final binary.
 
+## Development
+
+```sh
+make test     # go test -race ./...
+make lint     # golangci-lint run ./...
+make fmt      # gofumpt + goimports
+make check    # lint + test
+```
+
+Per-language extractors live under `internal/lang/<name>/`. Each
+sub-package owns its own tree-sitter query, parser pool, and
+`DepKey` normalizer; the public dispatcher in `extract.go` picks one
+based on the `Language` argument.
+
+Releases are tag-driven: pushing a `v*.*.*` tag runs the full quality
+bar via `.github/workflows/release.yml` and creates a GitHub Release
+with auto-generated notes.
+
 ## License
 
 MIT
