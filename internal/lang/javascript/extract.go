@@ -66,10 +66,21 @@ func Extract(body []byte, opts extract.Options) (extract.Result, error) {
 
 	var res extract.Result
 
-	if opts.IncludeImports {
+	if opts.IncludeImports || opts.IncludeSymbols {
 		res.Imports = collectImports(tree, body)
 	}
-	// Symbols + callgraph land in P2/P3.
+	if opts.IncludeSymbols {
+		res.UsedSymbols = collectUsedSymbols(tree, body, res.Imports)
+	}
+	if opts.IncludeCallGraph {
+		res.CallGraph = collectCallGraph(tree, body)
+	}
+	// IncludeImports==false but IncludeSymbols==true: we collected
+	// Imports above for binding resolution; clear the slice so the
+	// caller's contract holds.
+	if !opts.IncludeImports {
+		res.Imports = nil
+	}
 
 	return res, nil
 }

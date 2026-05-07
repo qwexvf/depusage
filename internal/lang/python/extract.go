@@ -61,8 +61,17 @@ func Extract(body []byte, opts extract.Options) (extract.Result, error) {
 	defer tree.Close()
 
 	var res extract.Result
-	if opts.IncludeImports {
+	if opts.IncludeImports || opts.IncludeSymbols {
 		res.Imports = collectImports(tree, body)
+	}
+	if opts.IncludeSymbols {
+		res.UsedSymbols = collectUsedSymbols(tree, body, res.Imports)
+	}
+	if opts.IncludeCallGraph {
+		res.CallGraph = collectCallGraph(tree, body)
+	}
+	if !opts.IncludeImports {
+		res.Imports = nil
 	}
 	return res, nil
 }
