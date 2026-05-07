@@ -19,14 +19,14 @@ Pre-1.0. API may shift. Tracking the design in
 | Language   | Imports | Used symbols | Callgraph |
 |------------|:-------:|:------------:|:---------:|
 | JavaScript |    ✓    |       —      |     —     |
-| TypeScript |    —    |       —      |     —     |
-| Python     |    —    |       —      |     —     |
-| Go         |    —    |       —      |     —     |
-| Rust       |    —    |       —      |     —     |
-| Ruby       |    —    |       —      |     —     |
-| Java       |    —    |       —      |     —     |
-| PHP        |    —    |       —      |     —     |
-| C#         |    —    |       —      |     —     |
+| TypeScript |    ✓    |       —      |     —     |
+| Python     |    ✓    |       —      |     —     |
+| Go         |    ✓    |       —      |     —     |
+| Rust       |    ✓    |       —      |     —     |
+| Ruby       |    ✓    |       —      |     —     |
+| Java       |    ✓    |       —      |     —     |
+| PHP        |    ✓    |       —      |     —     |
+| C#         |    ✓    |       —      |     —     |
 
 ## Usage
 

@@ -28,8 +28,14 @@ func Extract(lang Language, body []byte, opts Options) (Result, error) {
 		return goExtract(body, opts)
 	case Rust:
 		return rsExtract(body, opts)
-	case Ruby, Java, PHP, CSharp:
-		return Result{}, fmt.Errorf("depusage: language %q not yet implemented", lang)
+	case Ruby:
+		return rbExtract(body, opts)
+	case Java:
+		return jvExtract(body, opts)
+	case PHP:
+		return phpExtract(body, opts)
+	case CSharp:
+		return csExtract(body, opts)
 	}
 	return Result{}, fmt.Errorf("depusage: unknown language %q", lang)
 }
