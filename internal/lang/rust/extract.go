@@ -55,6 +55,11 @@ func Extract(body []byte, opts extract.Options) (extract.Result, error) {
 	if opts.IncludeImports {
 		res.Imports = collectImports(tree, body)
 	}
+	if opts.IncludeCallGraph {
+		res.CallGraph = collectCallGraph(tree, body)
+	}
+	// UsedSymbols not implemented for Rust: typical usage is via full
+	// paths or derive macros, not local-name binding through `use`.
 	return res, nil
 }
 

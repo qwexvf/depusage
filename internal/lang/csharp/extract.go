@@ -54,6 +54,12 @@ func Extract(body []byte, opts extract.Options) (extract.Result, error) {
 	if opts.IncludeImports {
 		res.Imports = collectImports(tree, body)
 	}
+	if opts.IncludeCallGraph {
+		res.CallGraph = collectCallGraph(tree, body)
+	}
+	// UsedSymbols not implemented for C#: `using NS;` opens a namespace
+	// without binding a specific name; types are referenced by short
+	// name without an explicit per-import binding.
 	return res, nil
 }
 

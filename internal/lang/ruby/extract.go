@@ -53,6 +53,12 @@ func Extract(body []byte, opts extract.Options) (extract.Result, error) {
 	if opts.IncludeImports {
 		res.Imports = collectImports(tree, body)
 	}
+	if opts.IncludeCallGraph {
+		res.CallGraph = collectCallGraph(tree, body)
+	}
+	// UsedSymbols not implemented for Ruby: `require` doesn't introduce
+	// a local binding; gem entry-points become global constants/classes
+	// resolved at runtime.
 	return res, nil
 }
 
