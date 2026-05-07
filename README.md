@@ -11,39 +11,65 @@ in `node_modules` and never touched."
 
 ## Status
 
-Pre-1.0. API may shift. Tracking the design in
+Pre-1.0 — public types are stable, but new languages and rare
+syntactic edge cases may still bend the API. Tracking the design in
 [aegis-cli#25](https://github.com/qwexvf/aegis-cli/issues/25).
 
 ## Languages
 
 | Language   | Imports | Used symbols | Callgraph |
 |------------|:-------:|:------------:|:---------:|
-| JavaScript |    ✓    |       —      |     —     |
-| TypeScript |    ✓    |       —      |     —     |
-| Python     |    ✓    |       —      |     —     |
-| Go         |    ✓    |       —      |     —     |
-| Rust       |    ✓    |       —      |     —     |
-| Ruby       |    ✓    |       —      |     —     |
-| Java       |    ✓    |       —      |     —     |
-| PHP        |    ✓    |       —      |     —     |
-| C#         |    ✓    |       —      |     —     |
+| JavaScript |    ✓    |      ✓       |     ✓     |
+| TypeScript |    ✓    |      ✓       |     ✓     |
+| Python     |    ✓    |      ✓       |     ✓     |
+| Go         |    ✓    |      ✓       |     ✓     |
+| Java       |    ✓    |      ✓       |     ✓     |
+| PHP        |    ✓    |      ✓       |     ✓     |
+| Rust       |    ✓    |      —       |     ✓     |
+| Ruby       |    ✓    |      —       |     ✓     |
+| C#         |    ✓    |      —       |     ✓     |
+
+**Used-symbol caveat.** The pass tracks bindings that an `import` /
+`use` statement introduces by *name* (`import { foo } from 'bar'`,
+`use Foo\Bar`, etc.). Rust's `use` brings names into scope but the
+typical reachability hook is a `derive` macro on a struct rather than
+a call site, so the result is sparse and we omit it for now. Ruby's
+`require` doesn't bind a local name at all — gem entry-points become
+runtime globals. C#'s `using NS;` opens a namespace without naming a
+binding either. For all three, callers should treat
+`Reachability=Used` as the strongest signal available.
 
 ## Usage
 
 ```go
 import "github.com/qwexvf/depusage"
 
-src := []byte(`import { merge } from "lodash"; merge({}, {});`)
+src := []byte(`
+import { merge } from "lodash";
+function transform(x) { return merge({}, x); }
+function main()      { return transform({a: 1}); }
+`)
 res, err := depusage.Extract(depusage.JavaScript, src, depusage.Options{
-    IncludeImports: true,
+    IncludeImports:   true,
+    IncludeSymbols:   true,
+    IncludeCallGraph: true,
 })
 if err != nil {
     log.Fatal(err)
 }
 for _, imp := range res.Imports {
-    fmt.Println(imp.DepKey, imp.Symbols) // lodash [merge]
+    fmt.Println("import", imp.DepKey, imp.Symbols) // lodash [merge]
+}
+for _, u := range res.UsedSymbols {
+    fmt.Println("used", u.DepKey, u.Symbol)        // lodash merge
+}
+for caller, callees := range res.CallGraph.Edges {
+    fmt.Println("calls", caller, "->", callees)    // main -> [transform]
 }
 ```
+
+Each pass is opt-in via `Options`. Passing zero options returns an
+empty `Result` — every cost is gated.
 
 ## Requirements
 
@@ -67,7 +93,8 @@ based on the `Language` argument.
 
 Releases are tag-driven: pushing a `v*.*.*` tag runs the full quality
 bar via `.github/workflows/release.yml` and creates a GitHub Release
-with auto-generated notes.
+with auto-generated notes. Per-version notes live in
+[`CHANGELOG.md`](./CHANGELOG.md).
 
 ## License
 
